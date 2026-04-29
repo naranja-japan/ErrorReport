@@ -103,7 +103,7 @@ public sealed partial class MainWindow : Window
 
             ErrorReportService.CreateReminderMail(subject, message, targetStaffId, orderId);
 
-            await ShowDialog("送信完了", "エラー報告を送信しました。");
+            await ShowSuccessInfoAsync("エラー報告を送信しました。");
             Close();
         }
         catch (Exception ex)
@@ -135,6 +135,14 @@ public sealed partial class MainWindow : Window
             XamlRoot = Content.XamlRoot
         };
         await dialog.ShowAsync();
+    }
+
+    private async Task ShowSuccessInfoAsync(string message)
+    {
+        StatusInfoBar.Message = message;
+        StatusInfoBar.IsOpen = true;
+        await Task.Delay(2000);
+        StatusInfoBar.IsOpen = false;
     }
 
     private async void ShowError(string message)
