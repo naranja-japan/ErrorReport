@@ -1,0 +1,3 @@
+[*]
+spelling_min_word_length = 3
+spelling_custom_dictionary_paths = .config/merged.dic,.config/vs-added.dic
