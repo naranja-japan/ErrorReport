@@ -121,7 +121,7 @@ try {
     # }
     # }
 
-    # --- 2c. 更新があれば確認して適用 ---
+    # --- 2c. 更新があればルールに従って適用 ---
     if ($updates.Count -gt 0) {
         Write-Host ""
         Write-Host "  Updates available:" -ForegroundColor Yellow
@@ -130,9 +130,20 @@ try {
             Write-Host "$($u.LatestVersion)" -ForegroundColor Green
         }
         Write-Host ""
-        $choice = Read-Host "  Update packages before deploying? (Y/n)"
-        if ($choice -eq "" -or $choice -match "^[Yy]") {
-            foreach ($u in $updates) {
+
+        $platformUpdates = @($updates | Where-Object { $_.Package -like "Naranja.Platform.*" })
+        $nonPlatformUpdates = @($updates | Where-Object { $_.Package -notlike "Naranja.Platform.*" })
+
+        if ($nonPlatformUpdates.Count -gt 0) {
+            Write-Host "  [WARN] Non-platform package updates are skipped by policy." -ForegroundColor Yellow
+            foreach ($u in $nonPlatformUpdates) {
+                Write-Host "    [SKIP] $($u.Package): $($u.CurrentVersion) -> $($u.LatestVersion)" -ForegroundColor DarkYellow
+            }
+        }
+
+        if ($platformUpdates.Count -gt 0) {
+            Write-Host "  Policy: Auto-updating Naranja.Platform packages..." -ForegroundColor Cyan
+            foreach ($u in $platformUpdates) {
                 Write-Host "  Updating $($u.Package) to $($u.LatestVersion)..." -ForegroundColor Cyan
                 dotnet add $MainProj package $u.Package --version $u.LatestVersion --no-restore
                 if ($LASTEXITCODE -ne 0) { throw "Failed to update $($u.Package)" }
@@ -141,10 +152,10 @@ try {
             if ($LASTEXITCODE -ne 0) { throw "dotnet restore failed after package update." }
 
             git add $MainProj
-            git commit -m "Update NuGet packages: $($updates | ForEach-Object { "$($_.Package) $($_.LatestVersion)" } | Join-String -Separator ', ')"
+            git commit -m "Update NuGet packages: $($platformUpdates | ForEach-Object { "$($_.Package) $($_.LatestVersion)" } | Join-String -Separator ', ')"
             Write-Host "  OK Packages updated and committed" -ForegroundColor Green
         } else {
-            Write-Host "  Skipped. Deploying with current versions." -ForegroundColor Gray
+            Write-Host "  No Naranja.Platform updates to apply. Deploying with current versions." -ForegroundColor Gray
         }
     } else {
         Write-Host "  All Naranja.Platform packages are up to date." -ForegroundColor Green
