@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="Naranja.ErrorReport.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="NDC エラー報告">
+
+    <Window.SystemBackdrop>
+        <MicaBackdrop Kind="BaseAlt" />
+    </Window.SystemBackdrop>
+
+    <Grid x:Name="RootPanel" Padding="16,12,16,16" RowSpacing="6" Loaded="RootPanel_Loaded">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Row 0: 報告種別 + 送信先スタッフ (1行) -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8">
+            <RadioButton x:Name="ErrorReportRadio" Content="エラー報告"
+                         GroupName="ReportMode" IsChecked="True" MinWidth="0" Padding="6,4" />
+            <RadioButton x:Name="ScreenshotRadio" Content="スクリーンショット送付 To:"
+                         GroupName="ReportMode" MinWidth="0" Padding="6,4"
+                         Checked="ScreenshotRadio_Checked"
+                         Unchecked="ScreenshotRadio_Unchecked" />
+            <ComboBox x:Name="StaffCombo"
+                      DisplayMemberPath="ShortName" SelectedValuePath="StaffId"
+                      IsEnabled="False" MinWidth="120" VerticalAlignment="Center"
+                      MaxDropDownHeight="800" />
+        </StackPanel>
+
+        <!-- Row 1: 件名 -->
+        <Grid Grid.Row="1" ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Subject:" VerticalAlignment="Center" />
+            <TextBox x:Name="SubjectText" Grid.Column="1" Text="エラー報告" />
+        </Grid>
+
+        <!-- Row 2: オーダーID + ヒント -->
+        <Grid Grid.Row="2" ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="OrderIdLabel" Text="オーダーID:" VerticalAlignment="Center" />
+            <TextBox x:Name="OrderIdText" Grid.Column="1"
+                     TextChanged="OrderIdText_TextChanged" />
+            <TextBlock Grid.Column="2" VerticalAlignment="Center" Opacity="0.5" FontSize="11"
+                       Text="開いているオーダー(発注)があれば自動入力。特定オーダー(発注)のエラー時は手動入力。※発注IDはマイナスで記入"
+                       TextWrapping="Wrap" />
+        </Grid>
+
+        <!-- Row 3: 文章ラベル -->
+        <TextBlock Grid.Row="3" Text="文章 (エラー報告時はエラーの状況＋再現方法を記入)" Opacity="0.7" />
+
+        <!-- Row 4: エラー状況 (残りスペースを全て使用) -->
+        <TextBox x:Name="DescriptionText" Grid.Row="4"
+                 PlaceholderText="エラーの状況を入力してください"
+                 AcceptsReturn="True" TextWrapping="Wrap"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto" />
+
+        <!-- Row 5: 送信ボタン + プログレス -->
+        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right"
+                    Spacing="12" Margin="0,4,0,0">
+            <ProgressRing x:Name="BusyRing" IsActive="False"
+                          Width="24" Height="24" Visibility="Collapsed"
+                          VerticalAlignment="Center" />
+            <Button x:Name="SubmitButton" Content="エラー報告を送信"
+                    Style="{StaticResource AccentButtonStyle}"
+                    Padding="24,12"
+                    Click="SubmitButton_Click" />
+        </StackPanel>
+
+    </Grid>
+</Window>

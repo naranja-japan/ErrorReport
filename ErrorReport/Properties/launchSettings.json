@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ErrorReport (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "ErrorReport (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
