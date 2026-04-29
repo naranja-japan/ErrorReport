@@ -47,7 +47,7 @@ Write-Host "--- [$AppName] Deployment started ---" -ForegroundColor Cyan
 
 try {
     # --- 1. Git 事前チェック ---
-    Write-Host "[1/8] Checking Git status..."
+    Write-Host "[1/9] Checking Git status..."
     $currentBranch = (git rev-parse --abbrev-ref HEAD).Trim()
     if ($currentBranch -ne "develop") {
         throw "Deployment must be executed on the 'develop' branch. Current branch is: $currentBranch"
@@ -58,7 +58,7 @@ try {
     }
 
     # --- 2. NuGet パッケージ更新チェック ---
-    Write-Host "[2/8] Checking for NuGet package updates (Platform packages only)..."
+    Write-Host "[2/9] Checking for NuGet package updates (Platform packages only)..."
 
     [xml]$projXml = Get-Content $MainProj
     $updates = @()
@@ -166,7 +166,7 @@ try {
         throw "Directory.Build.props not found at: $PropsPath"
     }
     $newVer = Get-Date -Format "1.yyyy.MMdd.HHmm"
-    Write-Host "[3/8] Updating version to: $newVer" -ForegroundColor Yellow
+    Write-Host "[3/9] Updating version to: $newVer" -ForegroundColor Yellow
 
     [xml]$xml = Get-Content $PropsPath
     $xml.Project.PropertyGroup.Version = $newVer
@@ -176,13 +176,13 @@ try {
     git commit -m "Bump version to $newVer"
 
     # --- 4. ブランチ操作 & GitHub 同期 ---
-    Write-Host "[4/8] Syncing with GitHub & merging into main..."
+    Write-Host "[4/9] Syncing with GitHub & merging into main..."
     git push origin develop
     git checkout -q main
     git merge develop --no-ff -m "Release $newVer"
 
     # --- 5. ビルド実行 ---
-    Write-Host "[5/8] Running dotnet publish..." -ForegroundColor Cyan
+    Write-Host "[5/9] Running dotnet publish..." -ForegroundColor Cyan
 
     if (Test-Path $PublishOutput) { Remove-Item $PublishOutput -Recurse -Force }
     dotnet publish $MainProj -c Release -o $PublishOutput -v:q --nologo
@@ -190,7 +190,7 @@ try {
     Write-Host "  OK Published" -ForegroundColor Green
 
     # --- 6. 配信 ---
-    Write-Host "[6/8] Deploying to the target folder..."
+    Write-Host "[6/9] Deploying to the target folder..."
     if (-not (Test-Path $DeployTargetDir)) {
         New-Item -Path $DeployTargetDir -ItemType Directory -Force | Out-Null
     }
@@ -225,7 +225,7 @@ try {
     $deployInfo | Out-File $VersionJson -Encoding utf8 -Force
 
     # --- 7. Git タグ & 完了処理 ---
-    Write-Host "[7/8] Final push to GitHub & Tagging..."
+    Write-Host "[7/9] Final push to GitHub & Tagging..."
     git push origin main
     git tag -a "v$newVer" -m "Release $newVer"
     git push origin "v$newVer"
@@ -234,7 +234,21 @@ try {
 
     # --- 8. 後処理 ---
     if (Test-Path $FlagFile) { Remove-Item $FlagFile -Force }
-    Write-Host "[8/8] Deployment completed successfully." -ForegroundColor Green
+    Write-Host "[8/9] Deployment completed successfully." -ForegroundColor Green
+
+    # --- 9. 開発機のローカルに即座に反映 ---
+    # NaranjaAppUpdateAll.bat は手動実行用に pause を含むため、
+    # 3秒待ってプロセスを終了する (同期処理自体は即座に完了する)
+    $updateBat = "C:\ProgramData\NaranjaTools\NaranjaApp\NaranjaAppUpdateAll.bat"
+    if (Test-Path $updateBat) {
+        Write-Host "[9/9] Updating local NaranjaApp..." -ForegroundColor Cyan
+        $proc = Start-Process -FilePath $updateBat -PassThru
+        Start-Sleep -Seconds 3
+        if (!$proc.HasExited) { $proc | Stop-Process -Force }
+        Write-Host "  ✓ Local update completed" -ForegroundColor Green
+    } else {
+        Write-Host "  [WARN] NaranjaAppUpdateAll.bat not found. Skipping local update." -ForegroundColor Yellow
+    }
 }
 catch {
     Write-Host "[ERROR] $($_.Exception.Message)" -ForegroundColor Red
