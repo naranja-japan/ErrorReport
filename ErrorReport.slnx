@@ -17,4 +17,5 @@
     <Platform Solution="*|x86" Project="x86" />
     <Deploy />
   </Project>
+  <File Path="_MigrationHandoff.md" Copy="C:\Users\nakashimajunichiro\Documents\VsSolutions\NaranjaDataCenter\_MigrationHandoff.md" />
 </Solution>
