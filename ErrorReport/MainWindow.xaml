@@ -18,12 +18,21 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Row 0: 報告種別 + 送信先スタッフ (1行) -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8">
+        <!-- Row 0: 情報バー -->
+        <InfoBar x:Name="StatusInfoBar"
+                 Grid.Row="0"
+                 IsOpen="False"
+                 IsClosable="False"
+                 Severity="Success"
+                 Margin="0,0,0,6" />
+
+        <!-- Row 1: 報告種別 + 送信先スタッフ (1行) -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
             <RadioButton x:Name="ErrorReportRadio" Content="エラー報告"
                          GroupName="ReportMode" IsChecked="True" MinWidth="0" Padding="6,4" />
             <RadioButton x:Name="ScreenshotRadio" Content="スクリーンショット送付 To:"
@@ -36,8 +45,8 @@
                       MaxDropDownHeight="800" />
         </StackPanel>
 
-        <!-- Row 1: 件名 -->
-        <Grid Grid.Row="1" ColumnSpacing="8">
+        <!-- Row 2: 件名 -->
+        <Grid Grid.Row="2" ColumnSpacing="8">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -46,8 +55,8 @@
             <TextBox x:Name="SubjectText" Grid.Column="1" Text="エラー報告" />
         </Grid>
 
-        <!-- Row 2: オーダーID + ヒント -->
-        <Grid Grid.Row="2" ColumnSpacing="8">
+        <!-- Row 3: オーダーID + ヒント -->
+        <Grid Grid.Row="3" ColumnSpacing="8">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="100" />
@@ -61,17 +70,17 @@
                        TextWrapping="Wrap" />
         </Grid>
 
-        <!-- Row 3: 文章ラベル -->
-        <TextBlock Grid.Row="3" Text="文章 (エラー報告時はエラーの状況＋再現方法を記入)" Opacity="0.7" />
+        <!-- Row 4: 文章ラベル -->
+        <TextBlock Grid.Row="4" Text="文章 (エラー報告時はエラーの状況＋再現方法を記入)" Opacity="0.7" />
 
-        <!-- Row 4: エラー状況 (残りスペースを全て使用) -->
-        <TextBox x:Name="DescriptionText" Grid.Row="4"
+        <!-- Row 5: エラー状況 (残りスペースを全て使用) -->
+        <TextBox x:Name="DescriptionText" Grid.Row="5"
                  PlaceholderText="エラーの状況を入力してください"
                  AcceptsReturn="True" TextWrapping="Wrap"
                  ScrollViewer.VerticalScrollBarVisibility="Auto" />
 
-        <!-- Row 5: 送信ボタン + プログレス -->
-        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right"
+        <!-- Row 6: 送信ボタン + プログレス -->
+        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right"
                     Spacing="12" Margin="0,4,0,0">
             <ProgressRing x:Name="BusyRing" IsActive="False"
                           Width="24" Height="24" Visibility="Collapsed"
