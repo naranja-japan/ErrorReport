@@ -1,0 +1,16 @@
+{
+  "appKey": "ErrorReport",
+  "deployProfile": "SdkSingleApp",
+  "mainProject": "ErrorReport/ErrorReport/ErrorReport.csproj",
+  "publishOutputRelative": "ErrorReport/ErrorReport/bin/Release/publish",
+  "platformPackagePrefixes": [
+    "Naranja.Platform.Common",
+    "Naranja.Platform.Data"
+  ],
+  "shortcut": {
+    "baseName": "ErrorReport",
+    "appUserModelId": "Naranja.ErrorReport",
+    "description": "Error Report",
+    "mainExeName": "ErrorReport.exe"
+  }
+}
