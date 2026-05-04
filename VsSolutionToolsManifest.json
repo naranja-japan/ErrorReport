@@ -1,8 +1,8 @@
 {
   "appKey": "ErrorReport",
   "deployProfile": "SdkSingleApp",
-  "mainProject": "ErrorReport/ErrorReport/ErrorReport.csproj",
-  "publishOutputRelative": "ErrorReport/ErrorReport/bin/Release/publish",
+  "mainProject": "ErrorReport/ErrorReport.csproj",
+  "publishOutputRelative": "ErrorReport/bin/Release/publish",
   "platformPackagePrefixes": [
     "Naranja.Platform.Common",
     "Naranja.Platform.Data"
