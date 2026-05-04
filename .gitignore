@@ -22,7 +22,6 @@ publish/
 project.lock.json
 
 ## Logs
-_scripts/logs/
 
 ## OS
 Thumbs.db

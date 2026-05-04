@@ -11,27 +11,27 @@ public static class ErrorReportService
     /// <summary>アクティブなスタッフ一覧を取得します。</summary>
     public static List<Staff> GetActiveStaffs()
     {
-        using var db = new NdcDbContext();
+        using var db = new DbNaranjaContext();
         return [.. db.Staffs
-            .Where(s => s.StaffId > 0 && s.Selectable)
+            .Where(s => s.Id > 0 && s.Selectable)
             .OrderBy(s => s.StaffCode)];
     }
 
     /// <summary>現在の PC 名からスタッフ情報を特定します。</summary>
-    public static (short PcId, short StaffId) GetCurrentPcInfo()
+    public static (short PcNumberId, short StaffId) GetCurrentPcInfo()
     {
         var pcName = Environment.MachineName.ToUpper();
-        using var db = new NdcDbContext();
+        using var db = new DbNaranjaContext();
         var pc = db.PcNumbers.FirstOrDefault(p => p.PcName == pcName);
-        return pc is null ? ((short)0, (short)0) : (pc.PcId, pc.StaffId);
+        return pc is null ? ((short)0, (short)0) : (pc.Id, pc.StaffId);
     }
 
     /// <summary>スタッフの略称を取得します。</summary>
     public static string GetStaffShortName(short staffId)
     {
-        using var db = new NdcDbContext();
+        using var db = new DbNaranjaContext();
         return db.Staffs
-            .Where(s => s.StaffId == staffId)
+            .Where(s => s.Id == staffId)
             .Select(s => s.ShortName)
             .FirstOrDefault() ?? string.Empty;
     }
