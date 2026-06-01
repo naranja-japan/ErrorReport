@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Title="NDC エラー報告">
+    Title="エラー報告">
 
     <Window.SystemBackdrop>
         <MicaBackdrop Kind="BaseAlt" />
@@ -40,7 +40,7 @@
                          Checked="ScreenshotRadio_Checked"
                          Unchecked="ScreenshotRadio_Unchecked" />
             <ComboBox x:Name="StaffCombo"
-                      DisplayMemberPath="ShortName" SelectedValuePath="StaffId"
+                      DisplayMemberPath="ShortName" SelectedValuePath="Id"
                       IsEnabled="False" MinWidth="120" VerticalAlignment="Center"
                       MaxDropDownHeight="800" />
         </StackPanel>
