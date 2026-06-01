@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Naranja.ErrorReport.Services;
+using Naranja.Platform.Data.Models;
 
 namespace Naranja.ErrorReport;
 
@@ -84,13 +85,13 @@ public sealed partial class MainWindow : Window
 
             if (isErrorReport)
             {
-                message = $"NDCエラー報告\r\n\r\n報告者:{staffName}\r\nPC:{pcName}\r\n\r\nエラー状況:\r\n{description}\r\n\r\n";
+                message = $"エラー報告\r\n\r\n報告者:{staffName}\r\nPC:{pcName}\r\n\r\nエラー状況:\r\n{description}\r\n\r\n";
                 targetStaffId = 1;
             }
             else
             {
                 message = $"スクリーンショット送付\r\n\r\nFrom:{staffName}\r\nPC:{pcName}\r\n\r\n添付文章:\r\n{description}\r\n\r\n";
-                targetStaffId = StaffCombo.SelectedValue is short id ? id : (short)1;
+                targetStaffId = GetSelectedRecipientStaffId();
             }
 
             if (captured)
@@ -117,6 +118,18 @@ public sealed partial class MainWindow : Window
     }
 
     // ─── ヘルパー ─────────────────────────────────────────
+
+    /// <summary>スクリーンショット送付先 ComboBox から担当スタッフ ID を取得します。</summary>
+    private short GetSelectedRecipientStaffId()
+    {
+        if (StaffCombo.SelectedValue is short id)
+            return id;
+
+        if (StaffCombo.SelectedItem is Staff staff)
+            return staff.Id;
+
+        return 1;
+    }
 
     private void SetBusy(bool busy)
     {
