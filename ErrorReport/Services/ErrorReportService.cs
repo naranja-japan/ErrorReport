@@ -26,6 +26,41 @@ public static class ErrorReportService
         return pc is null ? ((short)0, (short)0) : (pc.Id, pc.StaffId);
     }
 
+    /// <summary>
+    /// NDC の排他ロック用フラグ（スタッフID + PC番号×1000）を組み立てます。
+    /// オーダー／発注の更新フラグがこの値のとき、当該 PC・スタッフがロック解除中です。
+    /// </summary>
+    public static int BuildMyUpdateFlag(short pcNumberId, short staffId)
+        => staffId + pcNumberId * 1000;
+
+    /// <summary>
+    /// 自分がロック解除している最新のオーダーID、または発注ID（マイナス）を返します。
+    /// 見つからない場合は 0 です。オーダーを優先し、無ければ発注を参照します。
+    /// </summary>
+    public static int GetUnlockedOrderOrPurchaseId(short pcNumberId, short staffId)
+    {
+        if (pcNumberId <= 0 || staffId <= 0)
+            return 0;
+
+        var myFlag = BuildMyUpdateFlag(pcNumberId, staffId);
+        using var db = new DbNaranjaContext();
+
+        var orderId = db.Orders
+            .Where(o => o.UpdateFlag == myFlag)
+            .OrderByDescending(o => o.Id)
+            .Select(o => o.Id)
+            .FirstOrDefault();
+        if (orderId > 0)
+            return orderId;
+
+        var purchaseId = db.Purchases
+            .Where(p => p.UpdateFlag == myFlag)
+            .OrderByDescending(p => p.Id)
+            .Select(p => p.Id)
+            .FirstOrDefault();
+        return purchaseId > 0 ? -purchaseId : 0;
+    }
+
     /// <summary>スタッフの略称を取得します。</summary>
     public static string GetStaffShortName(short staffId)
     {
