@@ -23,11 +23,15 @@ public sealed partial class MainWindow : Window
             var staffs = ErrorReportService.GetActiveStaffs();
             StaffCombo.ItemsSource = staffs;
 
-            var (_, staffId) = ErrorReportService.GetCurrentPcInfo();
+            var (pcNumberId, staffId) = ErrorReportService.GetCurrentPcInfo();
             _workingStaffId = staffId;
 
             if (staffId > 0)
                 StaffCombo.SelectedValue = staffId;
+
+            var unlockedId = ErrorReportService.GetUnlockedOrderOrPurchaseId(pcNumberId, staffId);
+            if (unlockedId != 0)
+                OrderIdText.Text = unlockedId.ToString();
         }
         catch (Exception ex)
         {
