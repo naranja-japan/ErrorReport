@@ -28,7 +28,3 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 .DS_Store
-
-# NaranjaCodeDictionary (辞書同期一時ファイル)
-.config/vs-added.dic
-.config/scanned.dic
