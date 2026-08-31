@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -10,6 +11,7 @@ using Naranja.Platform.Data.Models;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.System;
+using Windows.UI.Core;
 
 namespace Naranja.ErrorReport;
 
@@ -26,13 +28,11 @@ public sealed partial class MainWindow : Window
 
         AttachmentItems.ItemsSource = _attachments;
 
-        var pasteAccelerator = new KeyboardAccelerator
-        {
-            Key = VirtualKey.V,
-            Modifiers = VirtualKeyModifiers.Control
-        };
-        pasteAccelerator.Invoked += PasteAccelerator_Invoked;
-        RootPanel.KeyboardAccelerators.Add(pasteAccelerator);
+        // KeyboardAccelerator だとホバーで「Ctrl+V」ツールチップが出るため KeyDown で処理する
+        RootPanel.AddHandler(
+            UIElement.KeyDownEvent,
+            new KeyEventHandler(RootPanel_KeyDown),
+            handledEventsToo: true);
 
         Closed += (_, _) => _attachmentService.Dispose();
     }
@@ -83,19 +83,21 @@ public sealed partial class MainWindow : Window
         OrderIdLabel.Text = OrderIdText.Text.StartsWith('-') ? "発注ID:" : "オーダーID:";
     }
 
-    private async void PasteAccelerator_Invoked(
-        KeyboardAccelerator sender,
-        KeyboardAcceleratorInvokedEventArgs args)
+    private async void RootPanel_KeyDown(object sender, KeyRoutedEventArgs e)
     {
-        // await 前に Handled しないと Ctrl+V が二重処理され、同じ画像が2枚付く
-        args.Handled = true;
-        if (_pasteInProgress)
+        if (e.Key != VirtualKey.V || _pasteInProgress)
+            return;
+
+        var ctrl = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Control);
+        if ((ctrl & CoreVirtualKeyStates.Down) == 0)
             return;
 
         _pasteInProgress = true;
         try
         {
-            await TryAddImagesFromClipboardAsync();
+            var added = await TryAddImagesFromClipboardAsync();
+            if (added > 0)
+                e.Handled = true;
         }
         finally
         {
