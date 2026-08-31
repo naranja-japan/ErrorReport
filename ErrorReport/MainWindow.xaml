@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:Naranja.ErrorReport.Models"
+    xmlns:local="using:Naranja.ErrorReport"
     mc:Ignorable="d"
     Title="エラー報告">
 
@@ -13,10 +14,9 @@
         <MicaBackdrop Kind="BaseAlt" />
     </Window.SystemBackdrop>
 
-    <Grid x:Name="RootPanel" Padding="16,12,16,16" RowSpacing="6" Loaded="RootPanel_Loaded"
+    <Grid x:Name="RootPanel" Padding="16,12,16,16" RowSpacing="16" Loaded="RootPanel_Loaded"
           AllowDrop="True" DragOver="RootPanel_DragOver" Drop="RootPanel_Drop">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -68,18 +68,16 @@
             <TextBlock x:Name="OrderIdLabel" Text="オーダーID:" VerticalAlignment="Center" />
             <TextBox x:Name="OrderIdText" Grid.Column="1"
                      TextChanged="OrderIdText_TextChanged" />
-            <TextBlock Grid.Column="2" VerticalAlignment="Center" Opacity="0.5" FontSize="11"
-                       Text="開いているオーダー(発注)があれば自動入力。特定オーダー(発注)のエラー時は手動入力。※発注IDはマイナスで記入"
+            <TextBlock Grid.Column="2" VerticalAlignment="Center" Opacity="0.5" FontSize="13"
+                       Text="発注IDはマイナスで記入。&#10;開いているオーダー(発注)があれば自動入力します。"
                        TextWrapping="Wrap" />
         </Grid>
 
-        <!-- Row 4: 文章ラベル -->
-        <TextBlock Grid.Row="4" Text="文章 (エラー報告時はエラーの状況＋再現方法を記入)" Opacity="0.7" />
-
-        <!-- Row 5: 画像添付 -->
-        <StackPanel Grid.Row="5" Spacing="4">
-            <TextBlock Opacity="0.5" FontSize="11"
-                       Text="Ctrl+V で画像を添付（最大20枚）。未添付のときは送信時に全画面をキャプチャします。" />
+        <!-- Row 4: 画像添付 -->
+        <StackPanel Grid.Row="4" Spacing="4">
+            <TextBlock x:Name="PasteHintText"
+                       Opacity="0.5" FontSize="13"
+                       Text="Ctrl+Vでコピー済画像添付可。未添付のときは全画面キャプチャを送信します。" />
             <ScrollViewer x:Name="AttachmentScroll"
                           HorizontalScrollBarVisibility="Auto"
                           VerticalScrollBarVisibility="Disabled"
@@ -92,16 +90,20 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="models:AttachmentItem">
-                            <Grid Width="96" Height="96">
-                                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="4">
-                                    <Image Source="{x:Bind Preview}" Stretch="Uniform" Margin="4" />
-                                </Border>
+                            <Grid Width="104" Height="104" Padding="0,8,8,0">
+                                <local:HandCursorGrid
+                                        Tapped="AttachmentPreview_Tapped"
+                                        ToolTipService.ToolTip="クリックでペイントで開く">
+                                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="4">
+                                        <Image Source="{x:Bind Preview}" Stretch="Uniform" Margin="4"
+                                               IsHitTestVisible="False" />
+                                    </Border>
+                                </local:HandCursorGrid>
                                 <Button HorizontalAlignment="Right"
                                         VerticalAlignment="Top"
-                                        Margin="0,-6,-6,0"
                                         Padding="6,2"
                                         MinWidth="0"
                                         MinHeight="0"
@@ -117,14 +119,14 @@
             </ScrollViewer>
         </StackPanel>
 
-        <!-- Row 6: エラー状況 (残りスペースを全て使用) -->
-        <TextBox x:Name="DescriptionText" Grid.Row="6"
-                 PlaceholderText="エラーの状況を入力してください"
+        <!-- Row 5: エラー状況 (残りスペースを全て使用) -->
+        <TextBox x:Name="DescriptionText" Grid.Row="5"
+                 PlaceholderText="エラー内容をこちらに記載"
                  AcceptsReturn="True" TextWrapping="Wrap"
                  ScrollViewer.VerticalScrollBarVisibility="Auto" />
 
-        <!-- Row 7: 送信ボタン + プログレス -->
-        <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Right"
+        <!-- Row 6: 送信ボタン + プログレス -->
+        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right"
                     Spacing="12" Margin="0,4,0,0">
             <ProgressRing x:Name="BusyRing" IsActive="False"
                           Width="24" Height="24" Visibility="Collapsed"
