@@ -72,9 +72,13 @@ public static class ErrorReportService
     }
 
     /// <summary>スクリーンショットの保存先パスを生成します。</summary>
-    public static string GenerateScreenshotPath()
+    /// <param name="batchTime">同一送信バッチの基準時刻。省略時は現在時刻。</param>
+    /// <param name="index">0 始まりの連番。0 はサフィックスなし、1 以降は _01, _02 …</param>
+    public static string GenerateScreenshotPath(DateTime? batchTime = null, int index = 0)
     {
-        var fileName = $"{DateTime.Now:yyyyMMddHHmmss}_{Environment.MachineName.ToLower()}.png";
+        var timestamp = (batchTime ?? DateTime.Now).ToString("yyyyMMddHHmmss");
+        var suffix = index > 0 ? $"_{index:D2}" : string.Empty;
+        var fileName = $"{timestamp}_{Environment.MachineName.ToLower()}{suffix}.png";
         return Path.Combine(DfsRoot, @"naranja\9000_NDC\Data\NDCエラー報告キャプチャ", fileName);
     }
 
