@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -17,6 +18,7 @@ public sealed partial class MainWindow : Window
     private readonly ScreenshotAttachmentService _attachmentService = new();
     private readonly ObservableCollection<AttachmentItem> _attachments = [];
     private short _workingStaffId;
+    private bool _pasteInProgress;
 
     public MainWindow()
     {
@@ -85,9 +87,20 @@ public sealed partial class MainWindow : Window
         KeyboardAccelerator sender,
         KeyboardAcceleratorInvokedEventArgs args)
     {
-        var added = await TryAddImagesFromClipboardAsync();
-        if (added > 0)
-            args.Handled = true;
+        // await 前に Handled しないと Ctrl+V が二重処理され、同じ画像が2枚付く
+        args.Handled = true;
+        if (_pasteInProgress)
+            return;
+
+        _pasteInProgress = true;
+        try
+        {
+            await TryAddImagesFromClipboardAsync();
+        }
+        finally
+        {
+            _pasteInProgress = false;
+        }
     }
 
     private void RootPanel_DragOver(object sender, DragEventArgs e)
@@ -118,6 +131,22 @@ public sealed partial class MainWindow : Window
             _attachments.Remove(item);
 
         UpdateAttachmentPanelVisibility();
+    }
+
+    private void AttachmentPreview_Tapped(object sender, TappedRoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement { DataContext: AttachmentItem item })
+            return;
+
+        if (!File.Exists(item.TempPath))
+            return;
+
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = "mspaint.exe",
+            Arguments = $"\"{item.TempPath}\"",
+            UseShellExecute = true
+        });
     }
 
     // ─── 送信処理 ─────────────────────────────────────────
@@ -270,9 +299,13 @@ public sealed partial class MainWindow : Window
 
     private void UpdateAttachmentPanelVisibility()
     {
-        AttachmentScroll.Visibility = _attachments.Count > 0
+        var hasAttachments = _attachments.Count > 0;
+        AttachmentScroll.Visibility = hasAttachments
             ? Visibility.Visible
             : Visibility.Collapsed;
+        PasteHintText.Visibility = hasAttachments
+            ? Visibility.Collapsed
+            : Visibility.Visible;
     }
 
     private void ShowAttachmentLimitInfo()
