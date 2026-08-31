@@ -7,11 +7,10 @@
   <Folder Name="/ソリューション項目/">
     <File Path="VsSolutionToolsManifest.json" />
   </Folder>
-  <Project Path="ErrorReport/ErrorReport/ErrorReport.csproj">
+  <Project Path="ErrorReport/ErrorReport.csproj">
     <Platform Solution="*|ARM64" Project="ARM64" />
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
     <Deploy />
   </Project>
-  <File Path="_MigrationHandoff.md" Copy="C:\Users\nakashimajunichiro\Documents\VsSolutions\NaranjaDataCenter\_MigrationHandoff.md" />
 </Solution>
