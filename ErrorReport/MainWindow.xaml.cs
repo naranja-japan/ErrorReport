@@ -1,17 +1,38 @@
+using System.Collections.ObjectModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media.Imaging;
+using Naranja.ErrorReport.Models;
 using Naranja.ErrorReport.Services;
 using Naranja.Platform.Data.Models;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
+using Windows.System;
 
 namespace Naranja.ErrorReport;
 
 public sealed partial class MainWindow : Window
 {
+    private readonly ScreenshotAttachmentService _attachmentService = new();
+    private readonly ObservableCollection<AttachmentItem> _attachments = [];
     private short _workingStaffId;
 
     public MainWindow()
     {
         InitializeComponent();
+
+        AttachmentItems.ItemsSource = _attachments;
+
+        var pasteAccelerator = new KeyboardAccelerator
+        {
+            Key = VirtualKey.V,
+            Modifiers = VirtualKeyModifiers.Control
+        };
+        pasteAccelerator.Invoked += PasteAccelerator_Invoked;
+        RootPanel.KeyboardAccelerators.Add(pasteAccelerator);
+
+        Closed += (_, _) => _attachmentService.Dispose();
     }
 
     // ─── 初期化 ───────────────────────────────────────────
@@ -60,6 +81,45 @@ public sealed partial class MainWindow : Window
         OrderIdLabel.Text = OrderIdText.Text.StartsWith('-') ? "発注ID:" : "オーダーID:";
     }
 
+    private async void PasteAccelerator_Invoked(
+        KeyboardAccelerator sender,
+        KeyboardAcceleratorInvokedEventArgs args)
+    {
+        var added = await TryAddImagesFromClipboardAsync();
+        if (added > 0)
+            args.Handled = true;
+    }
+
+    private void RootPanel_DragOver(object sender, DragEventArgs e)
+    {
+        e.AcceptedOperation = e.DataView.Contains(StandardDataFormats.StorageItems)
+            ? DataPackageOperation.Copy
+            : DataPackageOperation.None;
+    }
+
+    private async void RootPanel_Drop(object sender, DragEventArgs e)
+    {
+        if (!e.DataView.Contains(StandardDataFormats.StorageItems))
+            return;
+
+        var items = await e.DataView.GetStorageItemsAsync();
+        await AddImagesFromStorageItemsAsync(items);
+    }
+
+    private void RemoveAttachment_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { Tag: string tempPath })
+            return;
+
+        _attachmentService.Remove(tempPath);
+
+        var item = _attachments.FirstOrDefault(a => a.TempPath == tempPath);
+        if (item is not null)
+            _attachments.Remove(item);
+
+        UpdateAttachmentPanelVisibility();
+    }
+
     // ─── 送信処理 ─────────────────────────────────────────
 
     private async void SubmitButton_Click(object sender, RoutedEventArgs e)
@@ -74,11 +134,19 @@ public sealed partial class MainWindow : Window
 
         try
         {
-            // スクリーンキャプチャ
-            var screenshotPath = ErrorReportService.GenerateScreenshotPath();
-            var captured = await ScreenCaptureService.CaptureAndSaveAsync(screenshotPath);
+            IReadOnlyList<string> savedPaths;
 
-            // メッセージ組み立て
+            if (_attachmentService.Count > 0)
+            {
+                savedPaths = await ScreenshotAttachmentService.CopyToDfsAsync(_attachmentService.Paths);
+            }
+            else
+            {
+                var screenshotPath = ErrorReportService.GenerateScreenshotPath();
+                var captured = await ScreenCaptureService.CaptureAndSaveAsync(screenshotPath);
+                savedPaths = captured ? [screenshotPath] : [];
+            }
+
             var staffName = ErrorReportService.GetStaffShortName(_workingStaffId);
             var pcName = Environment.MachineName.ToLower();
             bool isErrorReport = ErrorReportRadio.IsChecked == true;
@@ -98,9 +166,10 @@ public sealed partial class MainWindow : Window
                 targetStaffId = GetSelectedRecipientStaffId();
             }
 
-            if (captured)
+            if (savedPaths.Count > 0)
             {
-                message += $"スクリーンショット(右クリック→[ナランハファイル(フォルダ)を開く]):\r\n{screenshotPath}";
+                message += "スクリーンショット(右クリック→[ナランハファイル(フォルダ)を開く]):\r\n";
+                message += string.Join("\r\n", savedPaths);
             }
 
             var subject = $"{SubjectText.Text} {staffName}";
@@ -119,6 +188,98 @@ public sealed partial class MainWindow : Window
         {
             SetBusy(false);
         }
+    }
+
+    // ─── 添付画像 ─────────────────────────────────────────
+
+    private async Task<int> TryAddImagesFromClipboardAsync()
+    {
+        if (!_attachmentService.CanAdd)
+        {
+            ShowAttachmentLimitInfo();
+            return 0;
+        }
+
+        try
+        {
+            var paths = await _attachmentService.TryAddFromClipboardAsync();
+            if (paths.Count == 0)
+                return 0;
+
+            var count = await RegisterAddedPathsAsync(paths);
+            if (!_attachmentService.CanAdd)
+                ShowAttachmentLimitInfo();
+            return count;
+        }
+        catch (Exception ex)
+        {
+            ShowError($"画像の貼り付けに失敗しました。\n{ex.Message}");
+            return 0;
+        }
+    }
+
+    private async Task AddImagesFromStorageItemsAsync(IReadOnlyList<IStorageItem> items)
+    {
+        if (!_attachmentService.CanAdd)
+        {
+            ShowAttachmentLimitInfo();
+            return;
+        }
+
+        try
+        {
+            var paths = await _attachmentService.TryAddFromStorageItemsAsync(items);
+            if (paths.Count == 0)
+                return;
+
+            await RegisterAddedPathsAsync(paths);
+            if (!_attachmentService.CanAdd)
+                ShowAttachmentLimitInfo();
+        }
+        catch (Exception ex)
+        {
+            ShowError($"画像の追加に失敗しました。\n{ex.Message}");
+        }
+    }
+
+    private async Task<int> RegisterAddedPathsAsync(IReadOnlyList<string> paths)
+    {
+        foreach (var path in paths)
+        {
+            var preview = await LoadPreviewAsync(path);
+            _attachments.Add(new AttachmentItem
+            {
+                TempPath = path,
+                Index = _attachments.Count + 1,
+                Preview = preview
+            });
+        }
+
+        UpdateAttachmentPanelVisibility();
+        return paths.Count;
+    }
+
+    private static async Task<BitmapImage> LoadPreviewAsync(string path)
+    {
+        var image = new BitmapImage();
+        var file = await StorageFile.GetFileFromPathAsync(path);
+        using var stream = await file.OpenAsync(FileAccessMode.Read);
+        await image.SetSourceAsync(stream);
+        return image;
+    }
+
+    private void UpdateAttachmentPanelVisibility()
+    {
+        AttachmentScroll.Visibility = _attachments.Count > 0
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+    }
+
+    private void ShowAttachmentLimitInfo()
+    {
+        StatusInfoBar.Severity = InfoBarSeverity.Warning;
+        StatusInfoBar.Message = $"画像は最大 {ScreenshotAttachmentService.MaxAttachments} 枚まで添付できます。";
+        StatusInfoBar.IsOpen = true;
     }
 
     // ─── ヘルパー ─────────────────────────────────────────
@@ -156,6 +317,7 @@ public sealed partial class MainWindow : Window
 
     private async Task ShowSuccessInfoAsync(string message)
     {
+        StatusInfoBar.Severity = InfoBarSeverity.Success;
         StatusInfoBar.Message = message;
         StatusInfoBar.IsOpen = true;
         await Task.Delay(2000);

@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:Naranja.ErrorReport.Models"
     mc:Ignorable="d"
     Title="エラー報告">
 
@@ -12,8 +13,10 @@
         <MicaBackdrop Kind="BaseAlt" />
     </Window.SystemBackdrop>
 
-    <Grid x:Name="RootPanel" Padding="16,12,16,16" RowSpacing="6" Loaded="RootPanel_Loaded">
+    <Grid x:Name="RootPanel" Padding="16,12,16,16" RowSpacing="6" Loaded="RootPanel_Loaded"
+          AllowDrop="True" DragOver="RootPanel_DragOver" Drop="RootPanel_Drop">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -73,14 +76,55 @@
         <!-- Row 4: 文章ラベル -->
         <TextBlock Grid.Row="4" Text="文章 (エラー報告時はエラーの状況＋再現方法を記入)" Opacity="0.7" />
 
-        <!-- Row 5: エラー状況 (残りスペースを全て使用) -->
-        <TextBox x:Name="DescriptionText" Grid.Row="5"
+        <!-- Row 5: 画像添付 -->
+        <StackPanel Grid.Row="5" Spacing="4">
+            <TextBlock Opacity="0.5" FontSize="11"
+                       Text="Ctrl+V で画像を添付（最大20枚）。未添付のときは送信時に全画面をキャプチャします。" />
+            <ScrollViewer x:Name="AttachmentScroll"
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Disabled"
+                          Visibility="Collapsed">
+                <ItemsControl x:Name="AttachmentItems">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="8" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="models:AttachmentItem">
+                            <Grid Width="96" Height="96">
+                                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="4">
+                                    <Image Source="{x:Bind Preview}" Stretch="Uniform" Margin="4" />
+                                </Border>
+                                <Button HorizontalAlignment="Right"
+                                        VerticalAlignment="Top"
+                                        Margin="0,-6,-6,0"
+                                        Padding="6,2"
+                                        MinWidth="0"
+                                        MinHeight="0"
+                                        FontSize="11"
+                                        Content="×"
+                                        Tag="{x:Bind TempPath}"
+                                        Click="RemoveAttachment_Click"
+                                        ToolTipService.ToolTip="添付を削除" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </StackPanel>
+
+        <!-- Row 6: エラー状況 (残りスペースを全て使用) -->
+        <TextBox x:Name="DescriptionText" Grid.Row="6"
                  PlaceholderText="エラーの状況を入力してください"
                  AcceptsReturn="True" TextWrapping="Wrap"
                  ScrollViewer.VerticalScrollBarVisibility="Auto" />
 
-        <!-- Row 6: 送信ボタン + プログレス -->
-        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right"
+        <!-- Row 7: 送信ボタン + プログレス -->
+        <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Right"
                     Spacing="12" Margin="0,4,0,0">
             <ProgressRing x:Name="BusyRing" IsActive="False"
                           Width="24" Height="24" Visibility="Collapsed"
