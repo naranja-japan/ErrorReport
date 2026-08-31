@@ -123,7 +123,11 @@
         <TextBox x:Name="DescriptionText" Grid.Row="5"
                  PlaceholderText="エラー内容をこちらに記載"
                  AcceptsReturn="True" TextWrapping="Wrap"
-                 ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <TextBox.PlaceholderForeground>
+                <SolidColorBrush Color="{ThemeResource TextFillColorPrimary}" Opacity="0.3" />
+            </TextBox.PlaceholderForeground>
+        </TextBox>
 
         <!-- Row 6: 送信ボタン + プログレス -->
         <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right"
