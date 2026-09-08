@@ -1,5 +1,5 @@
 using Naranja.Platform.Data.Base;
-using Naranja.Platform.Data.Models;
+using Naranja.Platform.Data.Models.Company;
 using Naranja.Platform.Data.Services;
 
 namespace Naranja.ErrorReport.Services;

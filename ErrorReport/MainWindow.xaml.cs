@@ -7,7 +7,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Naranja.ErrorReport.Models;
 using Naranja.ErrorReport.Services;
-using Naranja.Platform.Data.Models;
+using Naranja.Platform.Data.Models.Company;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.System;
