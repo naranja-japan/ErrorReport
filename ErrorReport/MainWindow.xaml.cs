@@ -7,7 +7,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Naranja.ErrorReport.Models;
 using Naranja.ErrorReport.Services;
-using Naranja.Platform.Data.Models;
+using Naranja.Platform.Data.Models.Company;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.System;
@@ -34,7 +34,14 @@ public sealed partial class MainWindow : Window
             new KeyEventHandler(RootPanel_KeyDown),
             handledEventsToo: true);
 
-        Closed += (_, _) => _attachmentService.Dispose();
+        Closed += MainWindow_Closed;
+    }
+
+    private void MainWindow_Closed(object sender, WindowEventArgs args)
+    {
+        // ThenClose の Delay キャンセルは SuccessThenClose 側の Closed 購読に集約。
+        // ここはアプリ寿命の後始末のみ。
+        _attachmentService.Dispose();
     }
 
     // ─── 初期化 ───────────────────────────────────────────
@@ -208,8 +215,14 @@ public sealed partial class MainWindow : Window
 
             ErrorReportService.CreateReminderMail(subject, message, targetStaffId, orderId);
 
-            await ShowSuccessInfoAsync("エラー報告を送信しました。");
-            Close();
+            // 送信済み。残秒中にタイトルバー × しても成功扱い（業務は巻き戻さない）。
+            SetBusy(false);
+            SubmitButton.IsEnabled = false;
+            await SuccessThenClose.ShowSuccessThenCloseAsync(
+                this,
+                SuccessSnackbar,
+                "エラー報告を送信しました。");
+            return;
         }
         catch (Exception ex)
         {
@@ -217,7 +230,8 @@ public sealed partial class MainWindow : Window
         }
         finally
         {
-            SetBusy(false);
+            if (SubmitButton.IsEnabled)
+                SetBusy(false);
         }
     }
 
@@ -348,15 +362,6 @@ public sealed partial class MainWindow : Window
             XamlRoot = Content.XamlRoot
         };
         await dialog.ShowAsync();
-    }
-
-    private async Task ShowSuccessInfoAsync(string message)
-    {
-        StatusInfoBar.Severity = InfoBarSeverity.Success;
-        StatusInfoBar.Message = message;
-        StatusInfoBar.IsOpen = true;
-        await Task.Delay(2000);
-        StatusInfoBar.IsOpen = false;
     }
 
     private async void ShowError(string message)

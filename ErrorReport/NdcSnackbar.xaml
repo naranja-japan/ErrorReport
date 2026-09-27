@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="Naranja.ErrorReport.NdcSnackbar"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    VerticalAlignment="Top"
+    HorizontalAlignment="Stretch"
+    Visibility="Collapsed">
+
+    <!--
+      左右・上マージンと角丸は、後ろが少し見えてオーバーレイだと分かる印。
+      MaxWidth なし・影なし。Status InfoBar と同じ上端付近にかぶせる。
+    -->
+    <Border x:Name="RootBorder"
+            CornerRadius="8"
+            Margin="8,4,8,0"
+            Padding="12,8,8,8"
+            MinHeight="40"
+            Background="{ThemeResource SystemFillColorSuccessBackgroundBrush}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="MessageText"
+                       VerticalAlignment="Center"
+                       TextWrapping="Wrap"
+                       TextTrimming="CharacterEllipsis"
+                       MaxLines="2"
+                       Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                       IsTextTrimmedChanged="MessageText_IsTextTrimmedChanged" />
+            <Button x:Name="CloseButton"
+                    Grid.Column="1"
+                    Content="×"
+                    Padding="6,2"
+                    MinWidth="0"
+                    MinHeight="0"
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Click="CloseButton_Click"
+                    ToolTipService.ToolTip="閉じる" />
+        </Grid>
+    </Border>
+</UserControl>
