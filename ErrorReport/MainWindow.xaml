@@ -30,8 +30,8 @@
         <InfoBar x:Name="StatusInfoBar"
                  Grid.Row="0"
                  IsOpen="False"
-                 IsClosable="False"
-                 Severity="Success"
+                 IsClosable="True"
+                 Severity="Warning"
                  Margin="0,0,0,6" />
 
         <!-- Row 1: 報告種別 + 送信先スタッフ (1行) -->
@@ -140,6 +140,13 @@
                     Padding="24,12"
                     Click="SubmitButton_Click" />
         </StackPanel>
+
+        <!-- 本文は動かさない。InfoBar 直下〜本文上にかぶせる（押し下げ行にしない） -->
+        <local:NdcSnackbar x:Name="SuccessSnackbar"
+                           Grid.Row="1"
+                           Grid.RowSpan="6"
+                           VerticalAlignment="Top"
+                           HorizontalAlignment="Stretch" />
 
     </Grid>
 </Window>
