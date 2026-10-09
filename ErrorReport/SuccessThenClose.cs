@@ -9,7 +9,7 @@ namespace Naranja.ErrorReport;
 /// </summary>
 public static class SuccessThenClose
 {
-    public const int DefaultDurationMs = 3000;
+    public const int DefaultDurationMs = 1000;
 
     /// <summary>
     /// `{指定文言}残 N 秒で閉じます。` を出し、残秒 0 で Owner を Close する。

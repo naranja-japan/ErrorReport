@@ -45,7 +45,7 @@
             <ComboBox x:Name="StaffCombo"
                       DisplayMemberPath="ShortName" SelectedValuePath="Id"
                       IsEnabled="False" MinWidth="120" VerticalAlignment="Center"
-                      MaxDropDownHeight="800" />
+                      DropDownOpened="StaffCombo_DropDownOpened" />
         </StackPanel>
 
         <!-- Row 2: 件名 -->
@@ -141,10 +141,10 @@
                     Click="SubmitButton_Click" />
         </StackPanel>
 
-        <!-- 本文は動かさない。InfoBar 直下〜本文上にかぶせる（押し下げ行にしない） -->
+        <!-- 本文は動かさない。コンテンツ最上部（Row 0）からかぶせる（押し下げ行にしない） -->
         <local:NdcSnackbar x:Name="SuccessSnackbar"
-                           Grid.Row="1"
-                           Grid.RowSpan="6"
+                           Grid.Row="0"
+                           Grid.RowSpan="7"
                            VerticalAlignment="Top"
                            HorizontalAlignment="Stretch" />
 
