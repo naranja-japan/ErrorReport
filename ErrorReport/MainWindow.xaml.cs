@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using Microsoft.UI;
 using Microsoft.UI.Input;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -9,9 +11,11 @@ using Naranja.ErrorReport.Models;
 using Naranja.ErrorReport.Services;
 using Naranja.Platform.Data.Models.Company;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.Foundation;
 using Windows.Storage;
 using Windows.System;
 using Windows.UI.Core;
+using WinRT.Interop;
 
 namespace Naranja.ErrorReport;
 
@@ -83,6 +87,43 @@ public sealed partial class MainWindow : Window
         StaffCombo.IsEnabled = false;
         SubjectText.Text = "エラー報告";
         SubmitButton.Content = "エラー報告を送信";
+    }
+
+    /// <summary>
+    /// 画面の作業領域と ComboBox 位置からドロップダウン高さを決め、見切れ分はスクロールさせる。
+    /// </summary>
+    private void StaffCombo_DropDownOpened(object sender, object e)
+    {
+        const double marginDip = 12;
+        const double minHeightDip = 120;
+
+        var xamlRoot = StaffCombo.XamlRoot;
+        if (xamlRoot is null)
+            return;
+
+        var scale = xamlRoot.RasterizationScale;
+        var hwnd = WindowNative.GetWindowHandle(this);
+        var windowId = Win32Interop.GetWindowIdFromWindow(hwnd);
+        var workArea = DisplayArea.GetFromWindowId(windowId, DisplayAreaFallback.Nearest).WorkArea;
+
+        var topLeft = StaffCombo.TransformToVisual(null)
+            .TransformPoint(new Point(0, 0));
+        var bottomY = topLeft.Y + StaffCombo.ActualHeight;
+
+        // XamlRoot 原点をスクリーン座標へ（タイトルバー分を差し引く）
+        var windowPos = AppWindow.Position;
+        var windowSize = AppWindow.Size;
+        var clientHeightPx = xamlRoot.Size.Height * scale;
+        var nonClientTopPx = Math.Max(0, windowSize.Height - clientHeightPx);
+
+        var comboTopPx = windowPos.Y + nonClientTopPx + (topLeft.Y * scale);
+        var comboBottomPx = windowPos.Y + nonClientTopPx + (bottomY * scale);
+
+        var spaceBelowDip = (workArea.Y + workArea.Height - comboBottomPx) / scale;
+        var spaceAboveDip = (comboTopPx - workArea.Y) / scale;
+        var availableDip = Math.Max(spaceBelowDip, spaceAboveDip) - marginDip;
+
+        StaffCombo.MaxDropDownHeight = Math.Max(minHeightDip, availableDip);
     }
 
     private void OrderIdText_TextChanged(object sender, TextChangedEventArgs e)

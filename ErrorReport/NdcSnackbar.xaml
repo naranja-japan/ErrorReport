@@ -9,7 +9,7 @@
 
     <!--
       左右・上マージンと角丸は、後ろが少し見えてオーバーレイだと分かる印。
-      MaxWidth なし・影なし。Status InfoBar と同じ上端付近にかぶせる。
+      MaxWidth なし・影なし。配置側はコンテンツ最上部（Grid.Row=0）にかぶせる。
     -->
     <Border x:Name="RootBorder"
             CornerRadius="8"

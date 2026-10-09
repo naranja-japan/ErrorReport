@@ -5,7 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 namespace Naranja.ErrorReport;
 
 /// <summary>
-/// 短い成功などをコンテンツ上端付近にかぶせる社内コントロール。
+/// 短い成功などをコンテンツ最上部にかぶせる社内コントロール。
 /// 正本: NaranjaDataCenter/docs/WinUi3MigrationGuide.md 7章。
 /// DataCore Features/Ui/NdcSnackbar と同契約。見た目は後で揃える。
 /// </summary>
