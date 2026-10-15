@@ -26,7 +26,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Row 0: 情報バー -->
+        <!-- Row 0: Status InfoBar（押し下げ。公式 InfoBar＝アイコン＋テーマ Typography ≒14/12） -->
         <InfoBar x:Name="StatusInfoBar"
                  Grid.Row="0"
                  IsOpen="False"
