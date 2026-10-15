@@ -13,21 +13,22 @@
     -->
     <Border x:Name="RootBorder"
             CornerRadius="8"
-            Margin="8,4,8,0"
-            Padding="12,8,8,8"
+            Margin="8,8,8,0"
+            Padding="12,8,4,8"
             MinHeight="40"
-            Background="{ThemeResource SystemFillColorSuccessBackgroundBrush}">
-        <Grid>
+            Background="{ThemeResource InfoBarSuccessSeverityBackgroundBrush}">
+        <Grid MinHeight="32">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock x:Name="MessageText"
                        VerticalAlignment="Center"
+                       FontSize="12"
                        TextWrapping="Wrap"
                        TextTrimming="CharacterEllipsis"
                        MaxLines="2"
-                       Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                       Foreground="{ThemeResource InfoBarTitleForeground}"
                        IsTextTrimmedChanged="MessageText_IsTextTrimmedChanged" />
             <Button x:Name="CloseButton"
                     Grid.Column="1"
