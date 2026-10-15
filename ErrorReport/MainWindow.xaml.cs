@@ -368,7 +368,7 @@ public sealed partial class MainWindow : Window
     private void ShowAttachmentLimitInfo()
     {
         StatusInfoBar.Severity = InfoBarSeverity.Warning;
-        StatusInfoBar.Message = $"画像は最大 {ScreenshotAttachmentService.MaxAttachments} 枚まで添付できます。";
+        SetInfoBarText($"画像は最大 {ScreenshotAttachmentService.MaxAttachments} 枚まで添付できます。");
         StatusInfoBar.IsOpen = true;
     }
 
@@ -408,5 +408,17 @@ public sealed partial class MainWindow : Window
     private async void ShowError(string message)
     {
         await ShowDialog("エラー", message);
+    }
+
+    private void SetInfoBarText(string message, string title = "")
+    {
+        StatusInfoBar.Title = string.Empty;
+        StatusInfoBar.Message = string.Empty;
+        var t = (title ?? string.Empty).Trim();
+        var m = (message ?? string.Empty).Trim();
+        InfoBarTitleText.Text = t;
+        InfoBarTitleText.Visibility = string.IsNullOrEmpty(t) ? Visibility.Collapsed : Visibility.Visible;
+        InfoBarMessageText.Text = m;
+        InfoBarMessageText.Visibility = string.IsNullOrEmpty(m) ? Visibility.Collapsed : Visibility.Visible;
     }
 }

@@ -26,13 +26,32 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Row 0: Status InfoBar（押し下げ。公式 InfoBar＝アイコン＋テーマ Typography ≒14/12） -->
+        <!-- Row 0: Status InfoBar（押し下げ。Title/Message は空にし、Content で 12pt インライン） -->
         <InfoBar x:Name="StatusInfoBar"
                  Grid.Row="0"
                  IsOpen="False"
                  IsClosable="True"
                  Severity="Warning"
-                 Margin="0,0,0,6" />
+                 Margin="0,0,0,6">
+            <InfoBar.Content>
+                <Grid VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="InfoBarTitleText"
+                               FontSize="12"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center"
+                               Margin="0,0,8,0" />
+                    <TextBlock x:Name="InfoBarMessageText"
+                               Grid.Column="1"
+                               FontSize="12"
+                               TextWrapping="Wrap"
+                               VerticalAlignment="Center" />
+                </Grid>
+            </InfoBar.Content>
+        </InfoBar>
 
         <!-- Row 1: 報告種別 + 送信先スタッフ (1行) -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
