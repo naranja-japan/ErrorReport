@@ -7,7 +7,7 @@ namespace Naranja.ErrorReport;
 /// <summary>
 /// 短い成功などをコンテンツ最上部にかぶせる社内コントロール。
 /// 正本: NaranjaDataCenter/docs/WinUi3MigrationGuide.md 7章。
-/// DataCore Features/Ui/NdcSnackbar と同契約。見た目は後で揃える。
+/// DataCore Features/Ui/NdcSnackbar と同契約。メッセージは FontSize 12（InfoBar Message 相当）。
 /// </summary>
 public sealed partial class NdcSnackbar : UserControl
 {
