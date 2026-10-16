@@ -368,6 +368,7 @@ public sealed partial class MainWindow : Window
     private void ShowAttachmentLimitInfo()
     {
         StatusInfoBar.Severity = InfoBarSeverity.Warning;
+        InfoBarErrorIcon.Apply(StatusInfoBar, InfoBarSeverity.Warning);
         SetInfoBarText($"画像は最大 {ScreenshotAttachmentService.MaxAttachments} 枚まで添付できます。");
         StatusInfoBar.IsOpen = true;
     }

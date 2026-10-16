@@ -45,6 +45,7 @@
 
   <ItemGroup>
     <Content Include="Assets\favicon.ico" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Assets\InfoBarError.png" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <!--
