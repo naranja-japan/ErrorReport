@@ -9,7 +9,11 @@ namespace Naranja.ErrorReport;
 /// </summary>
 public static class SuccessThenClose
 {
+    /// <summary>通常の成功クローズ。500〜1500 ms の中央。</summary>
     public const int DefaultDurationMs = 1000;
+
+    /// <summary>IM・メール送信など、閉じることが予想できる高頻度操作。</summary>
+    public const int FamiliarCloseDurationMs = 500;
 
     /// <summary>
     /// `{指定文言}残 N 秒で閉じます。` を出し、残秒 0 で Owner を Close する。

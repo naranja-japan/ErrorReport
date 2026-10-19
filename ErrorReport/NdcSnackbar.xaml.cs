@@ -5,7 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 namespace Naranja.ErrorReport;
 
 /// <summary>
-/// 短い成功などをコンテンツ最上部にかぶせる社内コントロール。
+/// 意図的操作の成功確認をコンテンツ最上部にかぶせる社内コントロール。Success のみ。
 /// 正本: NaranjaDataCenter/docs/WinUi3MigrationGuide.md 7章。
 /// DataCore Features/Ui/NdcSnackbar と同契約。メッセージは FontSize 12（InfoBar Message 相当）。
 /// </summary>
