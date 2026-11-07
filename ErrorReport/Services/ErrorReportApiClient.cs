@@ -26,7 +26,7 @@ internal sealed class ErrorReportApiClient
         try
         {
             var response = await Http.GetAsync(
-                $"/api/error-report/bootstrap?pcName={Uri.EscapeDataString(pcName)}",
+                $"/api/apps/error-report/bootstrap?pcName={Uri.EscapeDataString(pcName)}",
                 cancellationToken);
             await EnsureSuccessAsync(response, cancellationToken);
             var payload = await response.Content.ReadFromJsonAsync<ErrorReportBootstrap>(JsonOptions, cancellationToken)
@@ -51,7 +51,7 @@ internal sealed class ErrorReportApiClient
         try
         {
             using var response = await Http.PostAsJsonAsync(
-                "/api/mail/reminder",
+                "/api/db/comm/mail/reminder",
                 new ReminderMailRequest
                 {
                     Subject = subject,
