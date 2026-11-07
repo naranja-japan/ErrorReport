@@ -9,7 +9,6 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Naranja.ErrorReport.Models;
 using Naranja.ErrorReport.Services;
-using Naranja.Platform.Data.Models.Company;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Storage;
@@ -23,7 +22,7 @@ public sealed partial class MainWindow : Window
 {
     private readonly ScreenshotAttachmentService _attachmentService = new();
     private readonly ObservableCollection<AttachmentItem> _attachments = [];
-    private short _workingStaffId;
+    private string _workingStaffShortName = string.Empty;
     private bool _pasteInProgress;
 
     public MainWindow()
@@ -50,22 +49,20 @@ public sealed partial class MainWindow : Window
 
     // ─── 初期化 ───────────────────────────────────────────
 
-    private void RootPanel_Loaded(object sender, RoutedEventArgs e)
+    private async void RootPanel_Loaded(object sender, RoutedEventArgs e)
     {
         try
         {
-            var staffs = ErrorReportService.GetActiveStaffs();
-            StaffCombo.ItemsSource = staffs;
+            var bootstrap = await ErrorReportService.BootstrapAsync();
+            StaffCombo.ItemsSource = bootstrap.Staffs;
 
-            var (pcNumberId, staffId) = ErrorReportService.GetCurrentPcInfo();
-            _workingStaffId = staffId;
+            _workingStaffShortName = bootstrap.CurrentStaffShortName;
 
-            if (staffId > 0)
-                StaffCombo.SelectedValue = staffId;
+            if (bootstrap.StaffId > 0)
+                StaffCombo.SelectedValue = bootstrap.StaffId;
 
-            var unlockedId = ErrorReportService.GetUnlockedOrderOrPurchaseId(pcNumberId, staffId);
-            if (unlockedId != 0)
-                OrderIdText.Text = unlockedId.ToString();
+            if (bootstrap.UnlockedOrderOrPurchaseId != 0)
+                OrderIdText.Text = bootstrap.UnlockedOrderOrPurchaseId.ToString();
         }
         catch (Exception ex)
         {
@@ -226,7 +223,7 @@ public sealed partial class MainWindow : Window
                 savedPaths = captured ? [screenshotPath] : [];
             }
 
-            var staffName = ErrorReportService.GetStaffShortName(_workingStaffId);
+            var staffName = _workingStaffShortName;
             var pcName = Environment.MachineName.ToLower();
             bool isErrorReport = ErrorReportRadio.IsChecked == true;
 
@@ -254,7 +251,7 @@ public sealed partial class MainWindow : Window
             var subject = $"{SubjectText.Text} {staffName}";
             _ = int.TryParse(OrderIdText.Text, out var orderId);
 
-            ErrorReportService.CreateReminderMail(subject, message, targetStaffId, orderId);
+            await ErrorReportService.CreateReminderMailAsync(subject, message, targetStaffId, orderId);
 
             // 送信済み。残秒中にタイトルバー × しても成功扱い（業務は巻き戻さない）。
             SetBusy(false);
@@ -381,7 +378,7 @@ public sealed partial class MainWindow : Window
         if (StaffCombo.SelectedValue is short id)
             return id;
 
-        if (StaffCombo.SelectedItem is Staff staff)
+        if (StaffCombo.SelectedItem is StaffLookup staff)
             return staff.Id;
 
         return 1;
