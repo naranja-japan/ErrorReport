@@ -1,13 +1,14 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using Naranja.ErrorReport.Models;
+using Naranja.Platform.Common;
 
 namespace Naranja.ErrorReport.Services;
 
 /// <summary><c>Naranja.Api</c>（localhost:5180）へエラー報告用の問い合わせをします。</summary>
 internal sealed class ErrorReportApiClient
 {
-    private const string BaseAddress = "http://localhost:5180";
+    private const string BaseAddress = LocalApiHost.BaseAddress;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -25,6 +26,7 @@ internal sealed class ErrorReportApiClient
     {
         try
         {
+            await LocalApiHost.EnsureReadyAsync(cancellationToken);
             var response = await Http.GetAsync(
                 $"/api/apps/error-report/bootstrap?pcName={Uri.EscapeDataString(pcName)}",
                 cancellationToken);
@@ -50,6 +52,7 @@ internal sealed class ErrorReportApiClient
     {
         try
         {
+            await LocalApiHost.EnsureReadyAsync(cancellationToken);
             using var response = await Http.PostAsJsonAsync(
                 "/api/db/comm/mail/reminder",
                 new ReminderMailRequest

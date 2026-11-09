@@ -35,7 +35,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1721" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260317003" />
-    <PackageReference Include="Naranja.Platform.Common" Version="1.2026.1107.2141" />
+    <PackageReference Include="Naranja.Platform.Common" Version="1.2026.1109.1345" />
     <PackageReference Include="System.Drawing.Common" Version="10.0.5" />
   </ItemGroup>
 
