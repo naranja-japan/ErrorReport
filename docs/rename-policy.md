@@ -11,4 +11,4 @@
   - `POST /api/db/comm/mail/reminder`
 - キャプチャ保存先の DFS フォルダ名（`NDCエラー報告キャプチャ`）は現行 NDC と共有するため変更しない
 
-置き場は `Naranja/ErrorReport`。残件の表は `Naranja/docs/transition-exceptions.md`。
+置き場は `Naranja/ErrorReport`。残件の表は `VsSolutionTools/docs/devapps/transition-exceptions.md`。
