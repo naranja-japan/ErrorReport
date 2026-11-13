@@ -405,7 +405,8 @@ public sealed partial class MainWindow : Window
 
     private async void ShowError(string message)
     {
-        await ShowDialog("エラー", message);
+        var withVersions = await AppVersionInfo.AppendFooterAsync(message);
+        await ShowDialog("エラー", withVersions);
     }
 
     private void SetInfoBarText(string message, string title = "")
