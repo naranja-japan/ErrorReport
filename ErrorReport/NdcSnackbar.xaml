@@ -24,7 +24,7 @@
             </Grid.ColumnDefinitions>
             <TextBlock x:Name="MessageText"
                        VerticalAlignment="Center"
-                       FontSize="12"
+                       FontSize="16"
                        TextWrapping="Wrap"
                        TextTrimming="CharacterEllipsis"
                        MaxLines="2"

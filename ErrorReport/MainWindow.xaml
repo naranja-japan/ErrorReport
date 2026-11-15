@@ -26,7 +26,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Row 0: Status InfoBar（押し下げ。Title/Message は空にし、Content で 12pt インライン） -->
+        <!-- Row 0: Status InfoBar（押し下げ。Title/Message は空にし、Content で 16pt インライン） -->
         <InfoBar x:Name="StatusInfoBar"
                  Grid.Row="0"
                  IsOpen="False"
@@ -40,13 +40,13 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <TextBlock x:Name="InfoBarTitleText"
-                               FontSize="12"
+                               FontSize="16"
                                FontWeight="Bold"
                                VerticalAlignment="Center"
                                Margin="0,0,8,0" />
                     <TextBlock x:Name="InfoBarMessageText"
                                Grid.Column="1"
-                               FontSize="12"
+                               FontSize="16"
                                TextWrapping="Wrap"
                                VerticalAlignment="Center" />
                 </Grid>
