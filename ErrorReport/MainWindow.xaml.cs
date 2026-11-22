@@ -24,10 +24,18 @@ public sealed partial class MainWindow : Window
     private readonly ObservableCollection<AttachmentItem> _attachments = [];
     private string _workingStaffShortName = string.Empty;
     private bool _pasteInProgress;
+    private SdkAppLocalUpdateUi? _localUpdate;
 
     public MainWindow()
     {
         InitializeComponent();
+        _localUpdate = new SdkAppLocalUpdateUi(
+            "ErrorReport",
+            UpdateBar,
+            UpdateBarMessageText,
+            UpdateLaterButton,
+            UpdateButton,
+            msg => ShowError(msg));
 
         AttachmentItems.ItemsSource = _attachments;
 
@@ -51,6 +59,7 @@ public sealed partial class MainWindow : Window
 
     private async void RootPanel_Loaded(object sender, RoutedEventArgs e)
     {
+        _localUpdate?.Check();
         try
         {
             var bootstrap = await ErrorReportService.BootstrapAsync();

@@ -26,13 +26,51 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Row 0: Status InfoBar（押し下げ。Title/Message は空にし、Content で 16pt インライン） -->
+        <!-- Row 0: InfoBar 群（押し下げ） -->
+        <StackPanel Grid.Row="0" Spacing="6" Margin="0,0,0,6">
+            <InfoBar
+                x:Name="UpdateBar"
+                IsOpen="False"
+                IsClosable="True"
+                Severity="Informational">
+                <InfoBar.Content>
+                    <Grid VerticalAlignment="Center" ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            x:Name="UpdateBarTitleText"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            VerticalAlignment="Center"
+                            Text="更新があります" />
+                        <TextBlock
+                            x:Name="UpdateBarMessageText"
+                            Grid.Column="1"
+                            FontSize="16"
+                            TextWrapping="Wrap"
+                            VerticalAlignment="Center" />
+                        <StackPanel
+                            Grid.Column="2"
+                            Orientation="Horizontal"
+                            Spacing="8"
+                            VerticalAlignment="Center">
+                            <Button x:Name="UpdateLaterButton" Content="後で" FontSize="16" />
+                            <Button
+                                x:Name="UpdateButton"
+                                Content="更新"
+                                FontSize="16"
+                                Style="{StaticResource AccentButtonStyle}" />
+                        </StackPanel>
+                    </Grid>
+                </InfoBar.Content>
+            </InfoBar>
         <InfoBar x:Name="StatusInfoBar"
-                 Grid.Row="0"
                  IsOpen="False"
                  IsClosable="True"
-                 Severity="Warning"
-                 Margin="0,0,0,6">
+                 Severity="Warning">
             <InfoBar.Content>
                 <Grid VerticalAlignment="Center">
                     <Grid.ColumnDefinitions>
@@ -52,6 +90,7 @@
                 </Grid>
             </InfoBar.Content>
         </InfoBar>
+        </StackPanel>
 
         <!-- Row 1: 報告種別 + 送信先スタッフ (1行) -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
