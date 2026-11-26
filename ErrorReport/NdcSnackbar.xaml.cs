@@ -11,7 +11,7 @@ namespace Naranja.ErrorReport;
 /// </summary>
 public sealed partial class NdcSnackbar : UserControl
 {
-    public const int DefaultDurationMs = 3000;
+    public const int DefaultDurationMs = 2000;
 
     private CancellationTokenSource? _hideCts;
 
